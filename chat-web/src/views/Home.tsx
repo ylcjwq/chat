@@ -26,9 +26,11 @@ const Home: React.FC = () => {
 
   const [footerHeight, setFooterHeight] = useState<number>(0);
   const handleFooterResize = (height: number) => {
+    // 监听底部高度变化并重新赋值
     setFooterHeight(height);
   };
-  const contentHeight = `calc(100vh - 64px - ${footerHeight}px -50px)`; // 动态计算内容区域高度
+  const viewportHeight = window.innerHeight; // 获取视口高度
+  const contentHeight = viewportHeight - footerHeight - 144; // 动态计算内容区域高度
 
   return (
     <Layout>
