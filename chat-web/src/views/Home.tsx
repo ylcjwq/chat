@@ -3,8 +3,9 @@ import {
   UploadOutlined,
   UserOutlined,
   VideoCameraOutlined,
+  MessageOutlined,
 } from "@ant-design/icons";
-import { Layout, Menu, theme, Input, Button, Space } from "antd";
+import { Layout, Menu, theme, Input, Tooltip, Space } from "antd";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -58,15 +59,23 @@ const Home: React.FC = () => {
           </div>
         </Content>
         <Footer style={{ textAlign: "center" }}>
-          <Space.Compact style={{ width: "100%" }}>
+          <Space.Compact style={{ width: "100%", position: "relative" }}>
             <Input.TextArea
-              allowClear
+              style={{ padding: "0 24px 0 0" }}
               maxLength={2000}
               showCount
               autoSize={{ minRows: 1, maxRows: 3 }}
               onResize={(e) => handleFooterResize(e.height)}
               placeholder="请输入"
             />
+            <div style={{ position: "absolute", right: 10, top: 6, zIndex: 1 }}>
+              <Tooltip title="发送（回车）">
+                <MessageOutlined
+                  style={{ color: "rgba(0,0,0,.45)", fontSize: 20 }}
+                  onClick={() => console.log("send")}
+                />
+              </Tooltip>
+            </div>
           </Space.Compact>
         </Footer>
       </Layout>
