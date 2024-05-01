@@ -6,6 +6,7 @@ import {
   MessageOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, theme, Input, Tooltip, Space } from "antd";
+import useInputValue from "@/components/useInputValue";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -32,6 +33,14 @@ const Home: React.FC = () => {
   };
   const viewportHeight = window.innerHeight; // 获取视口高度
   const contentHeight = viewportHeight - footerHeight - 144; // 动态计算内容区域高度
+
+  const [inputValue, handleInputChange, setInputValue] = useInputValue(""); // 自定义hooks中取出受控输入框方法
+  const sendMessage = (e: React.KeyboardEvent | React.MouseEvent) => {
+    // 发送
+    e.preventDefault(); // 阻止默认事件
+    console.log(inputValue);
+    setInputValue("");
+  };
 
   return (
     <Layout>
@@ -67,12 +76,15 @@ const Home: React.FC = () => {
               autoSize={{ minRows: 1, maxRows: 3 }}
               onResize={(e) => handleFooterResize(e.height)}
               placeholder="请输入"
+              value={inputValue}
+              onChange={handleInputChange}
+              onPressEnter={(e) => sendMessage(e)}
             />
             <div style={{ position: "absolute", right: 10, top: 6, zIndex: 1 }}>
               <Tooltip title="发送（回车）">
                 <MessageOutlined
                   style={{ color: "rgba(0,0,0,.45)", fontSize: 20 }}
-                  onClick={() => console.log("send")}
+                  onClick={(e) => sendMessage(e)}
                 />
               </Tooltip>
             </div>
