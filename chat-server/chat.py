@@ -32,13 +32,12 @@ async def forward_request(question: dict):
         'Content-Type': 'application/json'
     }
 
-    # 将请求转发给服务器 C
+    # 将请求转发给服务器
     response = requests.post(
         url, data=payload, headers=headers, timeout=60000, stream=True)
 
     def generate():
-        # 将服务器 C 返回的 SSE 数据流传输给页面 A
-        # 处理并逐个将每个块转发给页面 A
+        # 处理并逐个将每个块转发给页面
         for chunk in response.iter_lines():
             mChunk = chunk.decode('utf-8')
             print(mChunk)

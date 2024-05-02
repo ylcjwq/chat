@@ -25,8 +25,10 @@ const Home: React.FC = () => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  // 动态计算content区域的高度
   const [footerHeight, setFooterHeight] = useState<number>(0);
+  const [respMsg, setRespMsg] = useState<string>("");
+
+  // 动态计算content区域的高度
   const handleFooterResize = (height: number) => {
     setFooterHeight(height);
   };
@@ -53,7 +55,32 @@ const Home: React.FC = () => {
         break;
       }
       const text = decoder.decode(value);
-      console.log(text);
+      // console.log(text);
+      const jsonChunks = text.split("data: ");
+      jsonChunks.forEach((message) => {
+        if (message.trim() !== "") {
+          console.log(message);
+          if (message === "[DONE]") {
+            return;
+          }
+          try {
+            const parsed = JSON.parse(message);
+            const content = parsed.choices[0].delta.content;
+            if (content === undefined) {
+              return;
+            }
+            console.log(content);
+
+            setRespMsg((prevRespMsg) => prevRespMsg + content);
+          } catch (error) {
+            console.error(
+              "Could not JSON parse stream message",
+              message,
+              error
+            );
+          }
+        }
+      });
     }
   };
 
@@ -79,7 +106,7 @@ const Home: React.FC = () => {
               borderRadius: borderRadiusLG,
             }}
           >
-            content
+            {respMsg}
           </div>
         </Content>
         <Footer style={{ textAlign: "center" }}>
