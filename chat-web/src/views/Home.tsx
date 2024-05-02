@@ -33,9 +33,28 @@ const Home: React.FC = () => {
   const viewportHeight = window.innerHeight;
   const contentHeight = viewportHeight - footerHeight - 144;
 
-  const sendMessage = (value: string) => {
+  const sendMessage = async (value: string) => {
     console.log(value);
     // 这里可以添加发送消息的逻辑
+    const resp = await fetch("http://127.0.0.1:8000/stream", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ question: value }),
+    });
+    // 一部分一部分去读响应体
+    const reader = resp.body!.getReader();
+    const decoder = new TextDecoder(); // 文本解码器
+    while (1) {
+      const { done, value } = await reader.read();
+      if (done) {
+        // 读完了
+        break;
+      }
+      const text = decoder.decode(value);
+      console.log(text);
+    }
   };
 
   return (
