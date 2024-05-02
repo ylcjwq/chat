@@ -3,10 +3,9 @@ import {
   UploadOutlined,
   UserOutlined,
   VideoCameraOutlined,
-  MessageOutlined,
 } from "@ant-design/icons";
-import { Layout, Menu, theme, Input, Tooltip, Space } from "antd";
-import useInputValue from "@/components/useInputValue";
+import { Layout, Menu, theme } from "antd";
+import SendMessageBar from "@/components/SendMessageBar";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -26,20 +25,17 @@ const Home: React.FC = () => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
+  // 动态计算content区域的高度
   const [footerHeight, setFooterHeight] = useState<number>(0);
   const handleFooterResize = (height: number) => {
-    // 监听底部高度变化并重新赋值
     setFooterHeight(height);
   };
-  const viewportHeight = window.innerHeight; // 获取视口高度
-  const contentHeight = viewportHeight - footerHeight - 144; // 动态计算内容区域高度
+  const viewportHeight = window.innerHeight;
+  const contentHeight = viewportHeight - footerHeight - 144;
 
-  const [inputValue, handleInputChange, setInputValue] = useInputValue(""); // 自定义hooks中取出受控输入框方法
-  const sendMessage = (e: React.KeyboardEvent | React.MouseEvent) => {
-    // 发送
-    e.preventDefault(); // 阻止默认事件
-    console.log(inputValue);
-    setInputValue("");
+  const sendMessage = (value: string) => {
+    console.log(value);
+    // 这里可以添加发送消息的逻辑
   };
 
   return (
@@ -68,27 +64,10 @@ const Home: React.FC = () => {
           </div>
         </Content>
         <Footer style={{ textAlign: "center" }}>
-          <Space.Compact style={{ width: "100%", position: "relative" }}>
-            <Input.TextArea
-              style={{ padding: "0 24px 0 0" }}
-              maxLength={2000}
-              showCount
-              autoSize={{ minRows: 1, maxRows: 3 }}
-              onResize={(e) => handleFooterResize(e.height)}
-              placeholder="请输入"
-              value={inputValue}
-              onChange={handleInputChange}
-              onPressEnter={(e) => sendMessage(e)}
-            />
-            <div style={{ position: "absolute", right: 10, top: 6, zIndex: 1 }}>
-              <Tooltip title="发送（回车）">
-                <MessageOutlined
-                  style={{ color: "rgba(0,0,0,.45)", fontSize: 20 }}
-                  onClick={(e) => sendMessage(e)}
-                />
-              </Tooltip>
-            </div>
-          </Space.Compact>
+          <SendMessageBar
+            onSendMessage={sendMessage}
+            onResize={(e) => handleFooterResize(e.height)}
+          />
         </Footer>
       </Layout>
     </Layout>
