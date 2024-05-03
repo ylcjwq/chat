@@ -3,6 +3,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 import requests
+from dotenv import load_dotenv
+import os
+
+# 加载.env文件中的环境变量
+load_dotenv()
 
 app = FastAPI()
 # 添加跨域中间件
@@ -15,7 +20,8 @@ app.add_middleware(
 )
 
 history = []
-url = "https://api.chatanywhere.tech/v1/chat/completions"
+# 替换为你的ChatGPT API URL
+url = os.getenv("CHAT_URL")
 
 
 @app.post("/stream")
@@ -28,7 +34,8 @@ async def forward_request(question: dict):
         "stream": True,
     })
     headers = {
-        'Authorization': 'Bearer sk-OWTPo7uaer7h4dx1zZQ0JpitLWBVeexk5qOKTJGWQLsu9RPB',
+        # 替换为你的ChatGPT API Key
+        'Authorization': f'Bearer {os.getenv("CHAT_API_KEY")}',
         'Content-Type': 'application/json'
     }
 
