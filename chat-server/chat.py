@@ -47,7 +47,6 @@ async def forward_request(question: dict):
         # 处理并逐个将每个块转发给页面
         for chunk in response.iter_lines():
             mChunk = chunk.decode('utf-8')
-            print(mChunk)
             yield mChunk
 
     # 使用 StreamingResponse 直接返回生成器对象
