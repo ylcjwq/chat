@@ -104,12 +104,7 @@ const Home: React.FC = () => {
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
             }}
-          >
-            {/* <div className="avatar">
-              <img src="/gptAvatar.svg" alt="" />
-            </div>
-            <div className="content markdown-body">{respMsg}</div> */}
-          </div>
+          ></div>
         </Content>
         <Footer style={{ textAlign: "center" }}>
           <SendMessageBar
