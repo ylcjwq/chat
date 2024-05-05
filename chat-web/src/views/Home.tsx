@@ -58,20 +58,15 @@ const Home: React.FC = () => {
         break;
       }
       const text = decoder.decode(value);
-      const jsonChunks = text.split("data: ");
+      const jsonChunks = text.split("data: "); // 处理单条流包含多个data的情况
       jsonChunks.forEach((message) => {
         if (message.trim() !== "") {
-          console.log(message);
-          if (message === "[DONE]") {
-            return;
-          }
           try {
             const parsed = JSON.parse(message);
-            const content = parsed.choices[0].delta.content;
+            const content = parsed.content;
             if (content === undefined) {
               return;
             }
-            console.log(content);
             setRespMsg((prevRespMsg) => prevRespMsg + content);
             robot.append(content);
           } catch (error) {
