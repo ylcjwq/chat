@@ -1,5 +1,5 @@
 import json
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 import requests
@@ -24,90 +24,55 @@ history = []
 url = os.getenv("CHAT_URL")
 
 
-# @app.post("/stream")
-# async def forward_request(question: dict):
-#     print(question)
-#     global assistant_content
-#     assistant_content = ""
-#     history.append({"role": "user", "content": question["question"]})
-#     payload = json.dumps({
-#         "model": "gpt-3.5-turbo",
-#         "messages": history,
-#         "stream": True,
-#     })
-#     headers = {
-#         # 替换为你的ChatGPT API Key
-#         'Authorization': f'Bearer {os.getenv("CHAT_API_KEY")}',
-#         'Content-Type': 'application/json'
-#     }
-
-#     # 将请求转发给服务器
-#     response = requests.post(
-#         url, data=payload, headers=headers, timeout=60000, stream=True)
-
-#     def generate():
-#         global assistant_content
-#         # 处理并逐个将每个块转发给页面
-#         for chunk in response.iter_lines():
-#             mChunk = chunk.decode('utf-8')
-#             data = chunk.decode('utf-8').split("data: ")
-#             for json_list in data[1:]:
-#                 if json_list.endswith('[DONE]'):
-#                     break
-#                 item = json.loads(json_list.strip())
-#                 choices = item.get("choices", [])
-#                 if choices and choices[0] and 'finish_reason' in choices[0]:
-#                     if choices[0]['finish_reason'] == 'stop':
-#                         break
-#                     content = choices[0].get("delta", {}).get("content", "")
-#                     assistant_content += content
-#                     yield mChunk
-
-#     print(assistant_content)
-#     # 使用 StreamingResponse 直接返回生成器对象
-#     return StreamingResponse(generate(), media_type="text/event-stream")
-
 @app.post("/stream")
 async def forward_request(question: dict):
-    print(question)
-    assistant_content = ""  # 用于存储最终内容的全局变量
-    history.append({"role": "user", "content": question["question"]})
-    payload = json.dumps({
-        "model": "gpt-3.5-turbo",
-        "messages": history,
-        "stream": True,
-    })
-    headers = {
-        'Authorization': f'Bearer {os.getenv("CHAT_API_KEY")}',
-        'Content-Type': 'application/json'
-    }
+    try:
+        print(question)
+        assistant_content = ""  # 用于存储最终内容的全局变量
+        history.append({"role": "user", "content": question["question"]})
+        payload = json.dumps({
+            "model": "gpt-3.5-turbo",
+            "messages": history,
+            "stream": True,
+        })
+        headers = {
+            'Authorization': f'Bearer {os.getenv("CHAT_API_KEY")}',
+            'Content-Type': 'application/json'
+        }
 
-    response = requests.post(
-        url, data=payload, headers=headers, timeout=60000, stream=True)
+        response = requests.post(
+            url, data=payload, headers=headers, timeout=60000, stream=True)
 
-    def generate():
-        nonlocal assistant_content  # 使用 nonlocal 关键字
-        for chunk in response.iter_lines():
-            if chunk:
-                try:
-                    mChunk = chunk.decode('utf-8')
-                    data = mChunk.split("data: ")[1]  # 直接分割并获取第二部分
-                    if data.endswith("[DONE]"):
-                        print('assistant', assistant_content)
-                        history.append(
-                            {"role": "assistant", "content": assistant_content})
+        def generate():
+            nonlocal assistant_content  # 使用 nonlocal 关键字
+            for chunk in response.iter_lines():
+                if chunk:
+                    try:
+                        mChunk = chunk.decode('utf-8')
+                        data = mChunk.split("data: ")[1]  # 直接分割并获取第二部分
+                        if data.endswith("[DONE]"):
+                            print('assistant', assistant_content)
+                            history.append(
+                                {"role": "assistant", "content": assistant_content})
+                            break
+                        item = json.loads(data)
+                        choices = item.get("choices", [])
+                        if choices:
+                            content = choices[0].get(
+                                "delta", {}).get("content", "")
+                            assistant_content += content
+                            # 将内容作为生成器的一部分返回
+                            yield "data: " + json.dumps({"content": content}, ensure_ascii=False) + "\n\n"
+                    except Exception as e:
+                        print(e)
                         break
-                    item = json.loads(data)
-                    choices = item.get("choices", [])
-                    if choices:
-                        content = choices[0].get(
-                            "delta", {}).get("content", "")
-                        assistant_content += content
-                        # 将内容作为生成器的一部分返回
-                        yield "data: " + json.dumps({"content": content}, ensure_ascii=False) + "\n\n"
-                except Exception as e:
-                    print(e)
-                    break
 
-    # 返回生成器
-    return StreamingResponse(generate(), media_type="text/event-stream")
+        # 返回生成器
+        return StreamingResponse(generate(), media_type="text/event-stream")
+
+    except requests.exceptions.RequestException as e:
+        # 捕获请求相关的异常
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        # 捕获其他所有异常
+        raise HTTPException(status_code=500, detail=str(e))
