@@ -6,6 +6,7 @@ import {
 } from "@ant-design/icons";
 import { Layout, Menu, theme } from "antd";
 import SendMessageBar from "@/components/SendMessageBar";
+import { postQuestion } from "@/api/request";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -38,13 +39,7 @@ const Home: React.FC = () => {
   const sendMessage = async (value: string) => {
     console.log(value);
     // 这里可以添加发送消息的逻辑
-    const resp = await fetch("http://127.0.0.1:8000/stream", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ question: value }),
-    });
+    const resp = await postQuestion(value);
     // 一部分一部分去读响应体
     const reader = resp.body!.getReader();
     const decoder = new TextDecoder(); // 文本解码器
