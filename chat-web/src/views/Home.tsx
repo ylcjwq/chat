@@ -70,11 +70,7 @@ const Home: React.FC = () => {
             setRespMsg((prevRespMsg) => prevRespMsg + content);
             robot.append(content);
           } catch (error) {
-            console.error(
-              "Could not JSON parse stream message",
-              message,
-              error
-            );
+            console.error("这似乎不是一个json字符串", message, error);
           }
         }
       });
