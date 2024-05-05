@@ -7,6 +7,11 @@ import {
 import { Layout, Menu, theme } from "antd";
 import SendMessageBar from "@/components/SendMessageBar";
 import { postQuestion } from "@/api/request";
+import {
+  createUserContent,
+  createRobotContent,
+} from "@/components/ContentMessage";
+import "@/styles/content.css";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -38,7 +43,10 @@ const Home: React.FC = () => {
 
   const sendMessage = async (value: string) => {
     console.log(value);
+    const main = document.querySelector(".content_container") as Element;
+    createUserContent("问", value, main);
     // 这里可以添加发送消息的逻辑
+    const robot = createRobotContent(main);
     const resp = await postQuestion(value);
     // 一部分一部分去读响应体
     const reader = resp.body!.getReader();
@@ -50,7 +58,6 @@ const Home: React.FC = () => {
         break;
       }
       const text = decoder.decode(value);
-      // console.log(text);
       const jsonChunks = text.split("data: ");
       jsonChunks.forEach((message) => {
         if (message.trim() !== "") {
@@ -65,8 +72,8 @@ const Home: React.FC = () => {
               return;
             }
             console.log(content);
-
             setRespMsg((prevRespMsg) => prevRespMsg + content);
+            robot.append(content);
           } catch (error) {
             console.error(
               "Could not JSON parse stream message",
@@ -77,6 +84,7 @@ const Home: React.FC = () => {
         }
       });
     }
+    robot.over();
   };
 
   return (
@@ -94,6 +102,7 @@ const Home: React.FC = () => {
         <Header style={{ padding: 0, background: colorBgContainer }} />
         <Content style={{ margin: "10px 10px 0" }}>
           <div
+            className="content_container"
             style={{
               padding: 20,
               height: contentHeight,
@@ -101,7 +110,10 @@ const Home: React.FC = () => {
               borderRadius: borderRadiusLG,
             }}
           >
-            {respMsg}
+            {/* <div className="avatar">
+              <img src="/gptAvatar.svg" alt="" />
+            </div>
+            <div className="content markdown-body">{respMsg}</div> */}
           </div>
         </Content>
         <Footer style={{ textAlign: "center" }}>

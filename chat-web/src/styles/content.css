@@ -1,0 +1,30 @@
+.avatar {
+  background: #765bbd;
+  width: 30px;
+  height: 30px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.avatar img {
+  width: 22px;
+  height: 22px;
+}
+.typing .content {
+  position: relative;
+}
+.typing .content::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 16px;
+  background: #d5d9da;
+  animation: toggle 0.6s infinite;
+  opacity: 0;
+  left: var(--x);
+  top: var(--y);
+}

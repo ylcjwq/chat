@@ -1,7 +1,7 @@
 import React from "react";
 import { MessageOutlined } from "@ant-design/icons";
 import { Input, Tooltip, Space, message } from "antd";
-import useInputValue from "@/components/useInputValue";
+import useInputValue from "@/hooks/useInputValue";
 
 // 发送消息栏组件接口
 interface SendMessageBarProps {
