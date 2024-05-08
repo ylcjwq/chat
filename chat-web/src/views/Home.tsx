@@ -42,7 +42,6 @@ const Home: React.FC = () => {
   const contentHeight = viewportHeight - footerHeight - 144;
 
   const sendMessage = async (value: string) => {
-    console.log(value);
     const main = document.querySelector(".content_container") as Element;
     createUserContent("问", value, main);
     // 这里可以添加发送消息的逻辑
@@ -101,7 +100,6 @@ const Home: React.FC = () => {
             style={{
               padding: 20,
               height: contentHeight,
-              // background: colorBgContainer,
               borderRadius: borderRadiusLG,
               overflowY: "auto",
               scrollbarWidth: "none",

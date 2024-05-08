@@ -6,8 +6,6 @@ import "highlight.js/styles/base16/darcula.css";
 export const { createUserContent, createRobotContent } = (() => {
   marked.setOptions({
     highlight: function (code: any, lang: any) {
-      console.log(code, lang);
-
       if (lang && hljs.getLanguage(lang)) {
         return hljs.highlight(code, { language: lang }).value;
       }
@@ -122,8 +120,6 @@ export const { createUserContent, createRobotContent } = (() => {
                     <div class="content markdown-body" style="--x: -1000px; --y: 0px"></div>
                   </div>`;
     const contentDom = dom.querySelector(".content");
-    console.log(contentDom);
-
     let content = "";
     content_container.appendChild(dom);
     _updateCursor(contentDom);
