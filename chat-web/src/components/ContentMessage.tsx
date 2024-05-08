@@ -1,7 +1,7 @@
 import { marked } from "marked";
 import { markedHighlight } from "marked-highlight";
 import hljs from "highlight.js";
-import "highlight.js/styles/base16/darcula.css";
+import "highlight.js/styles/base16/github.css";
 
 export const { createUserContent, createRobotContent } = (() => {
   marked.setOptions({
