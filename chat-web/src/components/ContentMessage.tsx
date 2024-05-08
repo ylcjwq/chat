@@ -1,15 +1,29 @@
 import { marked } from "marked";
+import { markedHighlight } from "marked-highlight";
 import hljs from "highlight.js";
+import "highlight.js/styles/base16/darcula.css";
 
 export const { createUserContent, createRobotContent } = (() => {
   marked.setOptions({
     highlight: function (code: any, lang: any) {
+      console.log(code, lang);
+
       if (lang && hljs.getLanguage(lang)) {
         return hljs.highlight(code, { language: lang }).value;
       }
       return hljs.highlightAuto(code).value;
     },
   } as any);
+
+  marked.use(
+    markedHighlight({
+      langPrefix: "hljs language-",
+      highlight(code, lang) {
+        const language = hljs.getLanguage(lang) ? lang : "shell";
+        return hljs.highlight(code, { language }).value;
+      },
+    })
+  );
 
   function _createUserContent(
     username: string,
