@@ -28,3 +28,12 @@
   left: var(--x);
   top: var(--y);
 }
+.content {
+  margin: 10px 0 10px 40px;
+  padding: 10px;
+  border-radius: 10px;
+  position: relative;
+  display: inline-block;
+  max-width: 90%;
+  word-wrap: break-word;
+}

@@ -97,7 +97,7 @@ const Home: React.FC = () => {
             style={{
               padding: 20,
               height: contentHeight,
-              background: colorBgContainer,
+              // background: colorBgContainer,
               borderRadius: borderRadiusLG,
               overflowY: "auto",
               scrollbarWidth: "none",
