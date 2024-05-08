@@ -99,13 +99,15 @@ const Home: React.FC = () => {
               height: contentHeight,
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
+              overflowY: "auto",
+              scrollbarWidth: "none",
             }}
           ></div>
         </Content>
         <Footer style={{ textAlign: "center" }}>
           <SendMessageBar
             onSendMessage={sendMessage}
-            onResize={(e) => handleFooterResize(e.height)}
+            onResize={(e: any) => handleFooterResize(e.height)}
           />
         </Footer>
       </Layout>
