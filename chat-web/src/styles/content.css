@@ -37,3 +37,18 @@
   max-width: 90%;
   word-wrap: break-word;
 }
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo span {
+  background: linear-gradient(white, #38495a);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 20px;
+  font-weight: bolder;
+  margin-right: 10px;
+}
