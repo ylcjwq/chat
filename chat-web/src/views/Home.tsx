@@ -91,7 +91,7 @@ const Home: React.FC = () => {
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer }}>
           <div className="logo">
-            <span style={{ fontSize: 20 }}>Chat-GPT</span>
+            <span style={{ fontSize: 20 }}>🐕Chat-GPT🐕</span>
           </div>
         </Header>
         <Content style={{ margin: "10px 10px 0" }}>
