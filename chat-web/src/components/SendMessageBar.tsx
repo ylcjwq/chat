@@ -37,7 +37,11 @@ const SendMessageBar: React.FC<SendMessageBarProps> = ({
         placeholder="请输入"
         value={inputValue}
         onChange={handleInputChange}
-        onPressEnter={sendMessage}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            sendMessage(e);
+          }
+        }}
         onResize={onResize}
       />
       <div style={{ position: "absolute", right: 10, top: 6, zIndex: 1 }}>
