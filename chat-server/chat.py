@@ -5,9 +5,21 @@ from fastapi.responses import StreamingResponse
 import requests
 from dotenv import load_dotenv
 import os
+import logging
+from logging.handlers import RotatingFileHandler
 
 # 加载.env文件中的环境变量
 load_dotenv()
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        RotatingFileHandler('app.log', maxBytes=1024*1024*10,
+                            backupCount=3, encoding='utf-8'),
+        logging.StreamHandler()  # 同时输出到控制台
+    ]
+)
 
 app = FastAPI()
 # 添加跨域中间件
@@ -19,7 +31,7 @@ app.add_middleware(
     allow_headers=["*"],  # 允许的请求头
 )
 
-history = []
+history = [{"role": "system", "content": "你的名字叫小金AI，你是一个问答机器人，你的开发者是袁隆成。"}]
 # 替换为你的ChatGPT API URL
 url = os.getenv("CHAT_URL")
 
@@ -27,7 +39,7 @@ url = os.getenv("CHAT_URL")
 @app.post("/stream")
 async def forward_request(question: dict):
     try:
-        print(question)
+        logging.info(f"Received question: {question['question']}")
         assistant_content = ""  # 用于存储最终内容的全局变量
         history.append({"role": "user", "content": question["question"]})
         payload = json.dumps({
@@ -42,6 +54,7 @@ async def forward_request(question: dict):
 
         response = requests.post(
             url, data=payload, headers=headers, timeout=60000, stream=True)
+        logging.info("Request to the API was successful.")
 
         def generate():
             nonlocal assistant_content  # 使用 nonlocal 关键字
@@ -52,6 +65,8 @@ async def forward_request(question: dict):
                         data = mChunk.split("data: ")[1]  # 直接分割并获取第二部分
                         if data.endswith("[DONE]"):
                             print('assistant', assistant_content)
+                            logging.info(
+                                f"Received assistant: {assistant_content}")
                             history.append(
                                 {"role": "assistant", "content": assistant_content})
                             break
@@ -64,7 +79,7 @@ async def forward_request(question: dict):
                             # 将内容作为生成器的一部分返回
                             yield "data: " + json.dumps({"content": content}, ensure_ascii=False) + "\n\n"
                     except Exception as e:
-                        print(e)
+                        logging.error(f"RequestException occurred: {str(e)}")
                         break
 
         # 返回生成器
@@ -72,7 +87,9 @@ async def forward_request(question: dict):
 
     except requests.exceptions.RequestException as e:
         # 捕获请求相关的异常
+        logging.error(f"RequestException occurred: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         # 捕获其他所有异常
+        logging.error(f"An unexpected error occurred: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

@@ -28,7 +28,17 @@
   left: var(--x);
   top: var(--y);
 }
-.content {
+.content.user {
+  margin: 10px 0 10px 40px;
+  padding: 10px;
+  border-radius: 10px;
+  position: relative;
+  display: inline-block;
+  max-width: 90%;
+  word-wrap: break-word;
+  background-color: rgb(127, 247, 127);
+}
+.content.robot {
   margin: 10px 0 10px 40px;
   padding: 10px;
   border-radius: 10px;

@@ -34,7 +34,7 @@ export const { createUserContent, createRobotContent } = (() => {
                     <div class="avatar">
                       ${username}
                     </div>
-                    <div class="content markdown-body">
+                    <div class="content markdown-body user">
                       ${_normalizeContent(content)}
                     </div>
                   </div>`;
@@ -117,7 +117,7 @@ export const { createUserContent, createRobotContent } = (() => {
                     <div class="avatar">
                     <img src="/gptAvatar.svg" alt="" />
                     </div>
-                    <div class="content markdown-body" style="--x: -1000px; --y: 0px"></div>
+                    <div class="content markdown-body robot" style="--x: -1000px; --y: 0px"></div>
                   </div>`;
     const contentDom = dom.querySelector(".content");
     let content = "";
