@@ -33,10 +33,11 @@ app.add_middleware(
 
 history = [{"role": "system", "content": "你的名字叫小金AI，你是一个问答机器人，你的开发者是袁隆成。"}]
 # 替换为你的ChatGPT API URL
-url = os.getenv("CHAT_URL")
+question_url = os.getenv("CHAT_URL")+'chat/completions'    # 问答地址
+use_token_url = os.getenv("CHAT_URL")+'query/usage_details'   # 计费地址
 
 
-@app.post("/stream")
+@app.post("/stream")  # 问答接口
 async def forward_request(question: dict):
     try:
         logging.info(f"Received question: {question['question']}")
@@ -53,7 +54,7 @@ async def forward_request(question: dict):
         }
 
         response = requests.post(
-            url, data=payload, headers=headers, timeout=60000, stream=True)
+            question_url, data=payload, headers=headers, timeout=60000, stream=True)
         logging.info("Request to the API was successful.")
 
         def generate():
@@ -64,7 +65,6 @@ async def forward_request(question: dict):
                         mChunk = chunk.decode('utf-8')
                         data = mChunk.split("data: ")[1]  # 直接分割并获取第二部分
                         if data.endswith("[DONE]"):
-                            print('assistant', assistant_content)
                             logging.info(
                                 f"Received assistant: {assistant_content}")
                             history.append(
@@ -93,3 +93,61 @@ async def forward_request(question: dict):
         # 捕获其他所有异常
         logging.error(f"An unexpected error occurred: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/getUseToken")  # 获取24小时内使用量
+def get_use_token():
+    try:
+        payload = json.dumps({
+            "model": "%",
+            "hours": 24
+        })
+        headers = {
+            'Authorization': f'{os.getenv("CHAT_API_KEY")}',
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.request(
+            "POST", use_token_url, headers=headers, data=payload)
+
+        # 检查响应状态码
+        response.raise_for_status()
+        logging.info(f"Received assistant: {response.json()}")
+        return response.json()
+
+    except requests.exceptions.HTTPError as http_err:
+        # 捕获HTTP错误
+        logging.error(f"HTTP error occurred: {str(http_err)}")
+        raise HTTPException(
+            status_code=response.status_code, detail=str(http_err))
+    except requests.exceptions.RequestException as e:
+        # 捕获请求相关的异常
+        logging.error(f"RequestException occurred: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        # 捕获其他所有异常
+        logging.error(f"An unexpected error occurred: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/getChatToken")  # 获取总使用量和剩余token量
+def get_chat_token():
+    try:
+        headers = {
+            'Authorization': f'{os.getenv("CHAT_API_KEY")}',
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.request(
+            "POST", os.getenv("GET_CHAT_URL"), headers=headers)
+
+        # 检查响应状态码
+        response.raise_for_status()
+        logging.info(f"Received assistant: {response.json()}")
+        return response.json()
+
+    except requests.exceptions.HTTPError as http_err:
+        # 捕获HTTP错误
+        logging.error(f"HTTP error occurred: {str(http_err)}")
+        raise HTTPException(
+            status_code=response.status_code, detail=str(http_err))

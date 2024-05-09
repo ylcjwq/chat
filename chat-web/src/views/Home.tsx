@@ -3,10 +3,11 @@ import {
   UploadOutlined,
   UserOutlined,
   VideoCameraOutlined,
+  AccountBookOutlined,
 } from "@ant-design/icons";
-import { Layout, Menu, theme } from "antd";
+import { Layout, Menu, theme, Tooltip } from "antd";
 import SendMessageBar from "@/components/SendMessageBar";
-import { postQuestion } from "@/api/request";
+import { postQuestion, getUseToken, getChatToken } from "@/api/request";
 import {
   createUserContent,
   createRobotContent,
@@ -77,6 +78,13 @@ const Home: React.FC = () => {
     robot.over();
   };
 
+  const createUseToken = async () => {
+    const data = await getUseToken();
+    const data2 = await getChatToken();
+    console.log(data);
+    console.log(data2);
+  };
+
   return (
     <Layout>
       <Sider breakpoint="lg" collapsedWidth="0">
@@ -89,9 +97,15 @@ const Home: React.FC = () => {
         />
       </Sider>
       <Layout>
-        <Header style={{ padding: 0, background: colorBgContainer }}>
+        <Header style={{ background: colorBgContainer }} className="header">
+          <Tooltip title="24小时内用量">
+            <AccountBookOutlined
+              style={{ color: "rgba(0,0,0,.45)", fontSize: 20, marginLeft: 10 }}
+              onClick={() => createUseToken()}
+            />
+          </Tooltip>
           <div className="logo">
-            <span style={{ fontSize: 20 }}>🐕Chat-GPT🐕</span>
+            <span>🐕Chat-GPT🐕</span>
           </div>
         </Header>
         <Content style={{ margin: "10px 10px 0" }}>
