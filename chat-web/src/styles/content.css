@@ -10,13 +10,16 @@
   overflow: hidden;
   white-space: nowrap;
 }
+
 .avatar img {
   width: 22px;
   height: 22px;
 }
+
 .typing .content {
   position: relative;
 }
+
 .typing .content::after {
   content: "";
   position: absolute;
@@ -28,6 +31,7 @@
   left: var(--x);
   top: var(--y);
 }
+
 .content.user {
   margin: 10px 0 10px 40px;
   padding: 10px;
@@ -38,6 +42,7 @@
   word-wrap: break-word;
   background-color: rgb(127, 247, 127);
 }
+
 .content.robot {
   margin: 10px 0 10px 40px;
   padding: 10px;
@@ -47,6 +52,7 @@
   max-width: 90%;
   word-wrap: break-word;
 }
+
 .logo {
   display: flex;
   align-items: center;
