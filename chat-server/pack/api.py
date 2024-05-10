@@ -1,43 +1,19 @@
-import json
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 import requests
-from dotenv import load_dotenv
-import os
-import logging
-from logging.handlers import RotatingFileHandler
+import json
+from pack.config import load_config
+from pack.my_logging import logging  # 导入日志记录器
 
-# 加载.env文件中的环境变量
-load_dotenv()
-# 配置日志
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        RotatingFileHandler('app.log', maxBytes=1024*1024*10,
-                            backupCount=3, encoding='utf-8'),
-        logging.StreamHandler()  # 同时输出到控制台
-    ]
-)
+api_router = APIRouter()
 
-app = FastAPI()
-# 添加跨域中间件
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # 允许所有来源的跨域请求，也可以指定特定的来源
-    allow_credentials=True,
-    allow_methods=["GET", "POST"],  # 允许的请求方法
-    allow_headers=["*"],  # 允许的请求头
-)
+# 从config获取的配置
+question_url, use_token_url, chat_api_key, get_chat_url = load_config()
 
 history = [{"role": "system", "content": "你的名字叫小金AI，你是一个问答机器人，你的开发者是袁隆成。"}]
-# 替换为你的ChatGPT API URL
-question_url = os.getenv("CHAT_URL")+'chat/completions'    # 问答地址
-use_token_url = os.getenv("CHAT_URL")+'query/usage_details'   # 计费地址
 
 
-@app.post("/stream")  # 问答接口
+@api_router.post("/stream")   # 问答接口
 async def forward_request(question: dict):
     try:
         logging.info(f"Received question: {question['question']}")
@@ -49,7 +25,7 @@ async def forward_request(question: dict):
             "stream": True,
         })
         headers = {
-            'Authorization': f'Bearer {os.getenv("CHAT_API_KEY")}',
+            'Authorization': f'Bearer {chat_api_key}',
             'Content-Type': 'application/json'
         }
 
@@ -95,7 +71,7 @@ async def forward_request(question: dict):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/getUseToken")  # 获取24小时内使用量
+@api_router.post("/getUseToken")  # 获取24小时内使用量
 def get_use_token():
     try:
         payload = json.dumps({
@@ -103,7 +79,7 @@ def get_use_token():
             "hours": 24
         })
         headers = {
-            'Authorization': f'{os.getenv("CHAT_API_KEY")}',
+            'Authorization': f'{chat_api_key}',
             'Content-Type': 'application/json'
         }
 
@@ -130,16 +106,16 @@ def get_use_token():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/getChatToken")  # 获取总使用量和剩余token量
+@api_router.post("/getChatToken")  # 获取总使用量和剩余token量
 def get_chat_token():
     try:
         headers = {
-            'Authorization': f'{os.getenv("CHAT_API_KEY")}',
+            'Authorization': f'{chat_api_key}',
             'Content-Type': 'application/json'
         }
 
         response = requests.request(
-            "POST", os.getenv("GET_CHAT_URL"), headers=headers)
+            "POST", get_chat_url, headers=headers)
 
         # 检查响应状态码
         response.raise_for_status()
