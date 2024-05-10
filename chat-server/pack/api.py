@@ -8,7 +8,7 @@ from pack.my_logging import logging  # 导入日志记录器
 api_router = APIRouter()
 
 # 从config获取的配置
-question_url, use_token_url, chat_api_key, get_chat_url = load_config()
+question_url, use_token_url, chat_api_key, get_chat_url, chat_api_key_ff = load_config()
 
 history = [{"role": "system", "content": "你的名字叫小金AI，你是一个问答机器人，你的开发者是袁隆成。"}]
 
@@ -120,7 +120,13 @@ def get_chat_token():
         # 检查响应状态码
         response.raise_for_status()
         logging.info(f"Received assistant: {response.json()}")
-        return response.json()
+
+        # 获取原始响应数据
+        raw_data = response.json()
+        # 过滤掉 apiKey 字段
+        filtered_data = {key: value for key,
+                         value in raw_data.items() if key != 'apiKey'}
+        return filtered_data
 
     except requests.exceptions.HTTPError as http_err:
         # 捕获HTTP错误

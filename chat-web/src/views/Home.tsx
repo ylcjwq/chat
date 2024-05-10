@@ -5,7 +5,7 @@ import {
   VideoCameraOutlined,
   AccountBookOutlined,
 } from "@ant-design/icons";
-import { Layout, Menu, theme, Tooltip } from "antd";
+import { Layout, Menu, theme, Tooltip, Spin, Modal } from "antd";
 import SendMessageBar from "@/components/SendMessageBar";
 import { postQuestion, getUseToken, getChatToken } from "@/api/request";
 import {
@@ -34,6 +34,7 @@ const Home: React.FC = () => {
 
   const [footerHeight, setFooterHeight] = useState<number>(0);
   const [respMsg, setRespMsg] = useState<string>("");
+  const [spinning, setSpinning] = useState<boolean>(false);
 
   // 动态计算content区域的高度
   const handleFooterResize = (height: number) => {
@@ -79,14 +80,28 @@ const Home: React.FC = () => {
   };
 
   const createUseToken = async () => {
-    const data = await getUseToken();
+    setSpinning(true);
+    // const data = await getUseToken();
     const data2 = await getChatToken();
-    console.log(data);
+    // console.log(data);
     console.log(data2);
+    setSpinning(false);
+    Modal.info({
+      title: "当前token使用情况",
+      content: (
+        <div>
+          <p>token总数：{data2.balanceTotal}</p>
+          <p>总使用量：{data2.balanceUsed}</p>
+          <p>剩余token：{data2.balanceTotal - data2.balanceUsed}</p>
+        </div>
+      ),
+      onOk() {},
+    });
   };
 
   return (
     <Layout>
+      <Spin spinning={spinning} fullscreen />
       <Sider breakpoint="lg" collapsedWidth="0">
         <div className="demo-logo-vertical" />
         <Menu
@@ -98,7 +113,7 @@ const Home: React.FC = () => {
       </Sider>
       <Layout>
         <Header style={{ background: colorBgContainer }} className="header">
-          <Tooltip title="24小时内用量">
+          <Tooltip title="查询用量">
             <AccountBookOutlined
               style={{ color: "rgba(0,0,0,.45)", fontSize: 20, marginLeft: 10 }}
               onClick={() => createUseToken()}
