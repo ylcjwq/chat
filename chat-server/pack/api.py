@@ -16,16 +16,21 @@ history = [{"role": "system", "content": "你的名字叫小金AI，你是一个
 @api_router.post("/stream")   # 问答接口
 async def forward_request(question: dict):
     try:
-        logging.info(f"Received question: {question['question']}")
+        logging.info(
+            f"Received question: {question['question'],question['model']}")
         assistant_content = ""  # 用于存储最终内容的全局变量
         history.append({"role": "user", "content": question["question"]})
         payload = json.dumps({
-            "model": "gpt-3.5-turbo",
+            "model": question['model'],
             "messages": history,
             "stream": True,
         })
+        if question['model'] == "gpt-3.5-turbo":
+            key = chat_api_key
+        else:
+            key = chat_api_key_ff
         headers = {
-            'Authorization': f'Bearer {chat_api_key}',
+            'Authorization': f'Bearer {key}',
             'Content-Type': 'application/json'
         }
 
@@ -55,8 +60,10 @@ async def forward_request(question: dict):
                             # 将内容作为生成器的一部分返回
                             yield "data: " + json.dumps({"content": content}, ensure_ascii=False) + "\n\n"
                     except Exception as e:
-                        logging.error(f"RequestException occurred: {str(e)}")
-                        break
+                        logging.error(
+                            f"RequestException occurred stream: {str(e)}")
+                        yield "data: " + json.dumps({"content": "服务器报错啦！！！，我也不知道啥原因，请联系袁隆成处理。"}, ensure_ascii=False) + "\n\n"
+                        return
 
         # 返回生成器
         return StreamingResponse(generate(), media_type="text/event-stream")
@@ -110,7 +117,7 @@ def get_use_token():
 def get_chat_token():
     try:
         headers = {
-            'Authorization': f'{chat_api_key}',
+            'Authorization': f'{chat_api_key_ff}',
             'Content-Type': 'application/json'
         }
 
