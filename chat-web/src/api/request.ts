@@ -1,6 +1,12 @@
-export const postQuestion = (question: string) => {
+/**
+ * 问答接口
+ * @param question 问题
+ * @param model 模型
+ * @returns
+ */
+export const postQuestion = (question: string, model: string) => {
   const url = `http://${import.meta.env.VITE_FETCH_URL}:8000/stream`;
-  const bodyData = { question: question };
+  const bodyData = { question: question, model: model };
 
   return fetch(url, {
     method: "POST",
@@ -11,6 +17,10 @@ export const postQuestion = (question: string) => {
   });
 };
 
+/**
+ * 查询24小时token用量
+ * @returns
+ */
 export const getUseToken = () => {
   const url = `http://${import.meta.env.VITE_FETCH_URL}:8000/getUseToken`;
 
@@ -27,6 +37,10 @@ export const getUseToken = () => {
   });
 };
 
+/**
+ * 查询总token用量
+ * @returns
+ */
 export const getChatToken = () => {
   const url = `http://${import.meta.env.VITE_FETCH_URL}:8000/getChatToken`;
 
@@ -40,5 +54,20 @@ export const getChatToken = () => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     return response.json(); // 将响应体解析为JSON
+  });
+};
+
+/**
+ * 清空上下文
+ * @returns
+ */
+export const cleanHistory = () => {
+  const url = `http://${import.meta.env.VITE_FETCH_URL}:8000/cleanHistory`;
+
+  return fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
 };

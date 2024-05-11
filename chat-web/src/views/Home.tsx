@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import {
-  UploadOutlined,
-  UserOutlined,
-  VideoCameraOutlined,
-  AccountBookOutlined,
-} from "@ant-design/icons";
+import { AccountBookOutlined } from "@ant-design/icons";
 import { Layout, Menu, theme, Tooltip, Spin, Modal } from "antd";
 import SendMessageBar from "@/components/SendMessageBar";
-import { postQuestion, getUseToken, getChatToken } from "@/api/request";
+import {
+  postQuestion,
+  getUseToken,
+  getChatToken,
+  cleanHistory,
+} from "@/api/request";
 import {
   createUserContent,
   createRobotContent,
@@ -16,16 +16,12 @@ import "@/styles/content.css";
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const items = [
-  UserOutlined,
-  VideoCameraOutlined,
-  UploadOutlined,
-  UserOutlined,
-].map((icon, index) => ({
-  key: String(index + 1),
-  icon: React.createElement(icon),
-  label: `nav ${index + 1}`,
-}));
+const items = ["gpt-3.5-turbo", "gpt-4-turbo-preview", "暂无", "暂无"].map(
+  (item, index) => ({
+    key: String(index + 1),
+    label: item,
+  })
+);
 
 const Home: React.FC = () => {
   const {
@@ -33,7 +29,7 @@ const Home: React.FC = () => {
   } = theme.useToken();
 
   const [footerHeight, setFooterHeight] = useState<number>(0);
-  const [respMsg, setRespMsg] = useState<string>("");
+  const [gptModel, setGptModel] = useState<string>("gpt-3.5-turbo");
   const [spinning, setSpinning] = useState<boolean>(false);
 
   // 动态计算content区域的高度
@@ -48,7 +44,7 @@ const Home: React.FC = () => {
     createUserContent("问", value, main);
     // 这里可以添加发送消息的逻辑
     const robot = createRobotContent(main);
-    const resp = await postQuestion(value);
+    const resp = await postQuestion(value, gptModel);
     // 一部分一部分去读响应体
     const reader = resp.body!.getReader();
     const decoder = new TextDecoder(); // 文本解码器
@@ -68,7 +64,6 @@ const Home: React.FC = () => {
             if (content === undefined) {
               return;
             }
-            setRespMsg((prevRespMsg) => prevRespMsg + content);
             robot.append(content);
           } catch (error) {
             console.error("这似乎不是一个json字符串", message, error);
@@ -99,6 +94,13 @@ const Home: React.FC = () => {
     });
   };
 
+  const changeModel = async (value: string) => {
+    setGptModel(value);
+    setSpinning(true);
+    await cleanHistory();
+    setSpinning(false);
+  };
+
   return (
     <Layout>
       <Spin spinning={spinning} fullscreen />
@@ -107,8 +109,11 @@ const Home: React.FC = () => {
         <Menu
           theme="dark"
           mode="inline"
-          defaultSelectedKeys={["4"]}
+          defaultSelectedKeys={["1"]}
           items={items}
+          onSelect={(e: any) =>
+            changeModel(items.filter((item) => item.key === e.key)[0].label)
+          }
         />
       </Sider>
       <Layout>
