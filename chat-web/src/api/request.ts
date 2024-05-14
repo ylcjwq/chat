@@ -18,6 +18,24 @@ export const postQuestion = (question: string, model: string) => {
 };
 
 /**
+ * 图片生成接口
+ * @param question 问题
+ * @returns
+ */
+export const postImage = (question: string) => {
+  const url = `http://${import.meta.env.VITE_FETCH_URL}:8000/getImage`;
+  const bodyData = { question: question };
+
+  return fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(bodyData),
+  });
+};
+
+/**
  * 查询24小时token用量
  * @returns
  */

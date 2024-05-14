@@ -4,7 +4,7 @@ import { Layout, Menu, theme, Tooltip, Spin, Modal } from "antd";
 import SendMessageBar from "@/components/SendMessageBar";
 import {
   postQuestion,
-  getUseToken,
+  postImage,
   getChatToken,
   cleanHistory,
 } from "@/api/request";
@@ -16,7 +16,7 @@ import "@/styles/content.css";
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const items = ["gpt-3.5-turbo", "gpt-4o", "暂无", "暂无"].map(
+const items = ["gpt-3.5-turbo", "gpt-4o", "图片生成", "暂无"].map(
   (item, index) => ({
     key: String(index + 1),
     label: item,
@@ -44,34 +44,41 @@ const Home: React.FC = () => {
     createUserContent("问", value, main);
     // 这里可以添加发送消息的逻辑
     const robot = createRobotContent(main);
-    const resp = await postQuestion(value, gptModel);
-    // 一部分一部分去读响应体
-    const reader = resp.body!.getReader();
-    const decoder = new TextDecoder(); // 文本解码器
-    while (1) {
-      const { done, value } = await reader.read();
-      if (done) {
-        // 读完了
-        break;
-      }
-      const text = decoder.decode(value);
-      const jsonChunks = text.split("data: "); // 处理单条流包含多个data的情况
-      jsonChunks.forEach((message) => {
-        if (message.trim() !== "") {
-          try {
-            const parsed = JSON.parse(message);
-            const content = parsed.content;
-            if (content === undefined) {
-              return;
-            }
-            robot.append(content);
-          } catch (error) {
-            console.error("这似乎不是一个json字符串", message, error);
-          }
+    if (gptModel === "图片生成") {
+      const resp = await postImage(value);
+      const data = await resp.json();
+      console.log(data.data[0].url);
+      robot.append(data.data[0].url);
+    } else {
+      const resp = await postQuestion(value, gptModel);
+      // 一部分一部分去读响应体
+      const reader = resp.body!.getReader();
+      const decoder = new TextDecoder(); // 文本解码器
+      while (1) {
+        const { done, value } = await reader.read();
+        if (done) {
+          // 读完了
+          break;
         }
-      });
+        const text = decoder.decode(value);
+        const jsonChunks = text.split("data: "); // 处理单条流包含多个data的情况
+        jsonChunks.forEach((message) => {
+          if (message.trim() !== "") {
+            try {
+              const parsed = JSON.parse(message);
+              const content = parsed.content;
+              if (content === undefined) {
+                return;
+              }
+              robot.append(content);
+            } catch (error) {
+              console.error("这似乎不是一个json字符串", message, error);
+            }
+          }
+        });
+      }
+      robot.over();
     }
-    robot.over();
   };
 
   const createUseToken = async () => {

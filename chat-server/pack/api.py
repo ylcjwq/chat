@@ -8,7 +8,7 @@ from pack.my_logging import logging  # 导入日志记录器
 api_router = APIRouter()
 
 # 从config获取的配置
-question_url, use_token_url, chat_api_key, get_chat_url, chat_api_key_ff = load_config()
+question_url, use_token_url, chat_api_key, get_chat_url, chat_api_key_ff, get_image_url = load_config()
 
 history = [{"role": "system", "content": "你的名字叫小金AI，你是一个问答机器人，你的开发者是袁隆成。"}]
 
@@ -153,5 +153,44 @@ def clean_history():
             content={"data": "历史记录已成功清除", "code": 200}
         )
     except Exception as e:
+        logging.error(f"An unexpected error occurred: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.post("/getImage")  # 获取图片
+def get_image(question: dict):
+    try:
+        headers = {
+            'Authorization': f'Bearer {chat_api_key_ff}',
+            'Content-Type': 'application/json'
+        }
+        payload = json.dumps({
+            "prompt": f"{question['question']},请说中文",
+            "n": 1,
+            "model": "dall-e-3",
+            "size": "1024x1024"
+        })
+        logging.info(f"生成图片指令: {question['question']}")
+        print(get_image_url)
+        response = requests.request(
+            "POST", get_image_url, headers=headers, data=payload)
+
+        # 检查响应状态码
+        response.raise_for_status()
+        logging.info(f"Received assistant: {response.json()}")
+
+        return response.json()
+
+    except requests.exceptions.HTTPError as http_err:
+        # 捕获HTTP错误
+        logging.error(f"HTTP error occurred: {str(http_err)}")
+        raise HTTPException(
+            status_code=response.status_code, detail=str(http_err))
+    except requests.exceptions.RequestException as e:
+        # 捕获请求相关的异常
+        logging.error(f"RequestException occurred: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        # 捕获其他所有异常
         logging.error(f"An unexpected error occurred: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
