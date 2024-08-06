@@ -16,7 +16,7 @@ import "@/styles/content.css";
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const items = ["gpt-3.5-turbo", "gpt-4o", "图片生成", "暂无"].map(
+const items = ["gpt-3.5-turbo", "gpt-4o-mini", "图片生成", "暂无"].map(
   (item, index) => ({
     key: String(index + 1),
     label: item,
