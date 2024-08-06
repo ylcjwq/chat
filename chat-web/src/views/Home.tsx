@@ -83,18 +83,15 @@ const Home: React.FC = () => {
 
   const createUseToken = async () => {
     setSpinning(true);
-    // const data = await getUseToken();
-    const data2 = await getChatToken();
-    // console.log(data);
-    console.log(data2);
+    const data = await getChatToken();
     setSpinning(false);
     Modal.info({
       title: "当前token使用情况",
       content: (
         <div>
-          <p>token总数：{data2.balanceTotal}</p>
-          <p>总使用量：{data2.balanceUsed}</p>
-          <p>剩余token：{data2.balanceTotal - data2.balanceUsed}</p>
+          <p>token总数：{data.balanceTotal}</p>
+          <p>总使用量：{data.balanceUsed}</p>
+          <p>剩余token：{data.balanceTotal - data.balanceUsed}</p>
         </div>
       ),
       onOk() {},
