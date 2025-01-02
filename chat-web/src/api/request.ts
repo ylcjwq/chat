@@ -5,7 +5,7 @@
  * @returns
  */
 export const postQuestion = (question: string, model: string) => {
-  const url = `http://${import.meta.env.VITE_FETCH_URL}:8000/stream`;
+  const url = `${import.meta.env.VITE_FETCH_URL}:8000/stream`;
   const bodyData = { question: question, model: model };
 
   return fetch(url, {
@@ -23,7 +23,7 @@ export const postQuestion = (question: string, model: string) => {
  * @returns
  */
 export const postImage = (question: string) => {
-  const url = `http://${import.meta.env.VITE_FETCH_URL}:8000/getImage`;
+  const url = `${import.meta.env.VITE_FETCH_URL}:8000/getImage`;
   const bodyData = { question: question };
 
   return fetch(url, {
@@ -40,7 +40,7 @@ export const postImage = (question: string) => {
  * @returns
  */
 export const getUseToken = () => {
-  const url = `http://${import.meta.env.VITE_FETCH_URL}:8000/getUseToken`;
+  const url = `${import.meta.env.VITE_FETCH_URL}:8000/getUseToken`;
 
   return fetch(url, {
     method: "POST",
@@ -60,7 +60,7 @@ export const getUseToken = () => {
  * @returns
  */
 export const getChatToken = () => {
-  const url = `http://${import.meta.env.VITE_FETCH_URL}:8000/getChatToken`;
+  const url = `${import.meta.env.VITE_FETCH_URL}:8000/getChatToken`;
 
   return fetch(url, {
     method: "POST",
@@ -80,7 +80,7 @@ export const getChatToken = () => {
  * @returns
  */
 export const cleanHistory = () => {
-  const url = `http://${import.meta.env.VITE_FETCH_URL}:8000/cleanHistory`;
+  const url = `${import.meta.env.VITE_FETCH_URL}:8000/cleanHistory`;
 
   return fetch(url, {
     method: "POST",
