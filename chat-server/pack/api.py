@@ -40,7 +40,7 @@ async def forward_request(question: dict):
 
         def generate():
             nonlocal assistant_content  # 使用 nonlocal 关键字
-            for chunk in response.iter_lines():
+            for chunk in response.iter_lines(chunk_size=10):
                 if chunk:
                     try:
                         mChunk = chunk.decode('utf-8')

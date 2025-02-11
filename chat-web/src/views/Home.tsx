@@ -16,7 +16,7 @@ import "@/styles/content.css";
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const items = ["gpt-3.5-turbo", "gpt-4o-mini", "图片生成", "暂无"].map(
+const items = ["gpt-3.5-turbo", "gpt-4o-mini", "图片生成", "deepseek-reasoner"].map(
   (item, index) => ({
     key: String(index + 1),
     label: item,
@@ -51,11 +51,13 @@ const Home: React.FC = () => {
       robot.append(data.data[0].url);
     } else {
       const resp = await postQuestion(value, gptModel);
+      
       // 一部分一部分去读响应体
       const reader = resp.body!.getReader();
       const decoder = new TextDecoder(); // 文本解码器
       while (1) {
         const { done, value } = await reader.read();
+        
         if (done) {
           // 读完了
           break;

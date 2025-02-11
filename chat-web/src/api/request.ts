@@ -12,6 +12,7 @@ export const postQuestion = (question: string, model: string) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "Accept": "text/event-stream"
     },
     body: JSON.stringify(bodyData),
   });
