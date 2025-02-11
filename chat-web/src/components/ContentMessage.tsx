@@ -46,11 +46,52 @@ export const { createUserContent, createRobotContent } = (() => {
   }
 
   function _normalizeContent(content: string) {
-    const html = marked.parse(content, {
+    const processedContent = content
+      .replace(/<think>([\s\S]*?)(<\/think>|$)/g, (_, thinkContent, closingTag) => {
+        // 当遇到</think>时闭合，否则保持未完成状态
+        const isCompleted = !!closingTag;
+        // 将思考内容包装到思考容器中，其余内容保持原样
+        return _createThinkBlock(
+          marked.parse(thinkContent.trim(), { breaks: true, gfm: true }) as string,
+          isCompleted
+        );
+      });
+  
+    // marked解析处理原始内容（非思考区域的部分）
+    const html = marked.parse(processedContent, {
       breaks: true,
       gfm: true,
     });
     return html;
+  }
+  
+  function _createThinkBlock(content: string, isCompleted: boolean) {
+    return `</div></div>` + // 结束前一个内容容器
+      `<div class="think-container ${isCompleted ? 'completed' : 'thinking'}">` + 
+        '<div class="think-header">' +
+          `<span class="arrow"></span>${isCompleted ? '思考完成（点击展开）' : '正在思考中...'}` +
+        '</div>' +
+        `<div class="think-content">${content}</div>` +
+      '</div>' +
+      '<div>'; // 开启新的内容容器
+  }
+
+  function _handleThinkBlocks(container: Element) {
+    container.querySelectorAll('.think-container').forEach(think => {
+      const header = think.querySelector('.think-header')!;
+      const content = think.querySelector('.think-content')! as HTMLElement;
+      const isCompleted = think.classList.contains('completed');
+
+      // 初始化显示状态
+      content.style.display = isCompleted ? 'none' : 'block';
+      think.classList.toggle('expanded', !isCompleted);
+  
+      // 点击交互逻辑
+      header.addEventListener('click', () => {
+        think.classList.toggle('expanded');
+        content.style.display = think.classList.contains('expanded') ? 'block' : 'none';
+      });
+    });
   }
 
   function createUserContent(
@@ -114,11 +155,13 @@ export const { createUserContent, createRobotContent } = (() => {
     const dom = document.createElement("div");
     dom.className = "robot block typing";
     dom.innerHTML = ` <div class="container">
-                    <div class="avatar">
-                    <img src="/gptAvatar.svg" alt="" />
-                    </div>
-                    <div class="content markdown-body robot" style="--x: -1000px; --y: 0px"></div>
-                  </div>`;
+                  <div class="avatar">
+                  <img src="/gptAvatar.svg" alt="" />
+                  </div>
+                  <div class="content markdown-body robot" style="--x: -1000px; --y: 0px">
+                    <div class="thinking-container"></div>
+                  </div>
+                </div>`;
     const contentDom = dom.querySelector(".content");
     let content = "";
     content_container.appendChild(dom);
@@ -128,6 +171,10 @@ export const { createUserContent, createRobotContent } = (() => {
       const html = _normalizeContent(content);
       const hitBottom = isBottom();
       contentDom!.innerHTML = html as string;
+
+      // 新增思维块处理
+      _handleThinkBlocks(contentDom!);
+
       if (hitBottom) {
         document.documentElement.scrollTo(0, 1000000);
       }
