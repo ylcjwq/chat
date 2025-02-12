@@ -9,7 +9,7 @@
 - gpt3.5
 - gpt4
 - 图片生成
--deepseek-r1(满血版)
+- deepseek-r1(满血版)
 
 ### 在线体验
 https://ylcweb.cn
