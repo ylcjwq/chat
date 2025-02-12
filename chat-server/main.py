@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pack.config import load_config
 from pack.my_logging import setup_logging
-from pack.api import api_router
+from api import api_router
 
 # 加载配置和环境变量
 load_config()
