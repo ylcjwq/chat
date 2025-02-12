@@ -134,17 +134,18 @@ const Home: React.FC = () => {
             <span>🐕Chat-GPT🐕</span>
           </div>
         </Header>
-        <Content style={{ margin: "10px 10px 0" }}>
+        <Content style={{ margin: "10px 10px 0", height: contentHeight, overflowY: "auto" }}>
           <div
             className="content_container"
             style={{
               padding: 20,
-              height: contentHeight,
-              borderRadius: borderRadiusLG,
+              // height: contentHeight,
+              borderRadius: borderRadiusLG,  
               overflowY: "auto",
               scrollbarWidth: "none",
             }}
-          ></div>
+          >
+          </div>
         </Content>
         <Footer style={{ textAlign: "center" }}>
           <SendMessageBar

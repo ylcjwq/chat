@@ -23,6 +23,16 @@ export const { createUserContent, createRobotContent } = (() => {
     })
   );
 
+  function _scrollToBottom(container: Element) {
+    // 改用容器本身的滚动特性
+    requestAnimationFrame(() => {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: 'smooth'
+      });
+    });
+  }
+
   function _createUserContent(
     username: string,
     content: string,
@@ -38,11 +48,8 @@ export const { createUserContent, createRobotContent } = (() => {
                       ${_normalizeContent(content)}
                     </div>
                   </div>`;
-    const hitBottom = isBottom();
     content_container.appendChild(dom);
-    if (hitBottom) {
-      document.documentElement.scrollTo(0, 1000000);
-    }
+    _scrollToBottom(content_container.parentElement!); // 向上查找实际滚动容器
   }
 
   function _normalizeContent(content: string) {
@@ -169,15 +176,13 @@ export const { createUserContent, createRobotContent } = (() => {
     function append(text: string) {
       content += text;
       const html = _normalizeContent(content);
-      const hitBottom = isBottom();
       contentDom!.innerHTML = html as string;
 
       // 新增思维块处理
       _handleThinkBlocks(contentDom!);
 
-      if (hitBottom) {
-        document.documentElement.scrollTo(0, 1000000);
-      }
+      _scrollToBottom(content_container.parentElement!);
+
       _updateCursor(contentDom);
     }
 
