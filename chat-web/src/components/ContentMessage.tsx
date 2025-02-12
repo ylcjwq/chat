@@ -148,16 +148,6 @@ export const { createUserContent, createRobotContent } = (() => {
     textNode.remove();
   }
 
-  function isBottom() {
-    return (
-      Math.abs(
-        document.documentElement.scrollTop +
-          document.documentElement.clientHeight -
-          document.documentElement.scrollHeight
-      ) < 20
-    );
-  }
-
   function createRobotContent(content_container: Element) {
     const dom = document.createElement("div");
     dom.className = "robot block typing";
