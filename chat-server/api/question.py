@@ -3,8 +3,10 @@ from fastapi.responses import StreamingResponse
 import requests
 import json
 from pack.config import load_config
-from pack.my_logging import logging  # 导入日志记录器
+from pack.my_logging import setup_logging  # 导入日志记录器
 from utils.auth import get_current_user
+
+logging = setup_logging()
 
 config = load_config()
 # 从config获取的配置
@@ -26,9 +28,9 @@ history = [
 
 
 # 问答接口
-async def forward_request(question: dict, current_user_id: int = Depends(get_current_user)):
+async def forward_request(question: dict, current_user: int = Depends(get_current_user)):
     try:
-        logging.info(f"Received question: {question['question'], question['model']}")
+        logging.info(f"用户ID[{current_user.user_id}]-问题：{question['question']}, 模型：{question['model']}")
         assistant_content = ""  # 用于存储最终内容的全局变量
         history.append({"role": "user", "content": question["question"]})
         payload = json.dumps(
@@ -47,7 +49,7 @@ async def forward_request(question: dict, current_user_id: int = Depends(get_cur
         response = requests.post(
             question_url, data=payload, headers=headers, timeout=60000, stream=True
         )
-        logging.info("Request to the API was successful.")
+        logging.info(f"用户ID[{current_user.user_id}]的提问回答完成。")
 
         def generate():
             nonlocal assistant_content  # 使用 nonlocal 关键字
@@ -57,7 +59,7 @@ async def forward_request(question: dict, current_user_id: int = Depends(get_cur
                         mChunk = chunk.decode("utf-8")
                         data = mChunk.split("data: ")[1]  # 直接分割并获取第二部分
                         if data.endswith("[DONE]"):
-                            logging.info(f"Received assistant: {assistant_content}")
+                            logging.info(f"用户ID[{current_user.user_id}]-回答为： {assistant_content}")
                             history.append(
                                 {"role": "assistant", "content": assistant_content}
                             )

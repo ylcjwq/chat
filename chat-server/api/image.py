@@ -1,14 +1,16 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
 import requests
 import json
 from pack.config import load_config
-from pack.my_logging import logging
+from pack.my_logging import setup_logging
+from utils.auth import get_current_user
 
+logging = setup_logging()
 config = load_config()
 chat_api_key_ff, get_image_url = config["chat_api_key_ff"], config["get_image_url"]
 
 
-def get_image(question: dict):
+def get_image(question: dict, current_user: int = Depends(get_current_user)):
     try:
         headers = {
             "Authorization": f"Bearer {chat_api_key_ff}",
@@ -22,7 +24,7 @@ def get_image(question: dict):
                 "size": "1024x1024",
             }
         )
-        logging.info(f"生成图片指令: {question['question']}")
+        logging.info(f"用户ID[{current_user.user_id}]生成图片指令: {question['question']}")
         print(get_image_url)
         response = requests.request(
             "POST", get_image_url, headers=headers, data=payload
@@ -30,7 +32,7 @@ def get_image(question: dict):
 
         # 检查响应状态码
         response.raise_for_status()
-        logging.info(f"Received assistant: {response.json()}")
+        logging.info(f"用户ID[{current_user.user_id}]问题回答: {response.json()}")
 
         return response.json()
 

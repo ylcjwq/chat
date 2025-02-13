@@ -2,7 +2,9 @@ from fastapi import HTTPException
 import requests
 import json
 from pack.config import load_config
-from pack.my_logging import logging
+from pack.my_logging import setup_logging
+
+logging = setup_logging()
 
 config = load_config()
 use_token_url, chat_api_key = config['use_token_url'], config['chat_api_key']

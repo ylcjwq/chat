@@ -1,4 +1,22 @@
 /**
+ * 登录接口
+ * @param data 用户名和密码 
+ * @returns 
+ */
+export const postLogin = (data: {username: string, password: string}) => {
+  const url = `${import.meta.env.VITE_FETCH_URL}/login`;
+  const bodyData = { user: data.username, password: data.password };
+
+  return fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(bodyData),
+  });
+};
+
+/**
  * 问答接口
  * @param question 问题
  * @param model 模型
@@ -12,7 +30,8 @@ export const postQuestion = (question: string, model: string) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Accept": "text/event-stream"
+      "Accept": "text/event-stream",
+      "Authorization": `Bearer ${localStorage.getItem("token")}`,
     },
     body: JSON.stringify(bodyData),
   });
@@ -31,6 +50,7 @@ export const postImage = (question: string) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("token")}`,
     },
     body: JSON.stringify(bodyData),
   });
@@ -47,6 +67,7 @@ export const getUseToken = () => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("token")}`,
     },
   }).then((response) => {
     if (!response.ok) {
@@ -67,6 +88,7 @@ export const getChatToken = () => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("token")}`,
     },
   }).then((response) => {
     if (!response.ok) {
@@ -87,6 +109,7 @@ export const cleanHistory = () => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("token")}`,
     },
   });
 };

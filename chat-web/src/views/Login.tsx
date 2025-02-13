@@ -6,12 +6,19 @@ import {
   EyeInvisibleOutlined,
   EyeTwoTone,
 } from "@ant-design/icons";
+import { postLogin } from "@/api/request";
 import "@/styles/login.css";
+import { useNavigate } from "react-router";
 
 const Login: React.FC = () => {
-  const onFinish = (values: any) => {
-    console.log("Received values of form: ", values);
-    // 在这里处理登录逻辑
+  const navigate = useNavigate();
+
+  const onFinish = async (values: any) => {
+    const res = await postLogin(values);
+    const data = await res.json();
+    localStorage.setItem("token", data.token);
+    // 跳转到聊天页面
+    navigate("/home");
   };
 
   return (

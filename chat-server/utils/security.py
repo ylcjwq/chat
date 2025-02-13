@@ -2,7 +2,7 @@ import jwt
 from fastapi import HTTPException
 
 # 密钥和算法（建议从环境变量或配置文件中获取）
-SECRET_KEY = "your_secret_key"
+SECRET_KEY = "ylcjwq"
 ALGORITHM = "HS256"
 
 

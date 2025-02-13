@@ -1,6 +1,8 @@
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
-from pack.my_logging import logging
+from pack.my_logging import setup_logging
+
+logging = setup_logging()
 
 
 def clean_history():
