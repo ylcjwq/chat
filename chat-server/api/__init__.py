@@ -4,9 +4,11 @@ from .use_token import get_use_token
 from .chat_token import get_chat_token
 from .clean_history import clean_history
 from .image import get_image
+from .login import login
 
 api_router = APIRouter()
 
+api_router.post("/login")(login)
 api_router.post("/stream")(forward_request)
 api_router.post("/getUseToken")(get_use_token)
 api_router.post("/getChatToken")(get_chat_token)

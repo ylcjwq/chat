@@ -23,15 +23,15 @@
   font-weight: 500;
 }
 
-.ant-input-affix-wrapper {
+.login-container .ant-input-affix-wrapper {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
   transition: all 0.3s ease;
 }
 
-.ant-input-affix-wrapper:hover,
-.ant-input-affix-wrapper:focus-within{
+.login-container .ant-input-affix-wrapper:hover,
+.login-container .ant-input-affix-wrapper:focus-within{
   border-color: #7c4dff;
   box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.2);
   color: #333;

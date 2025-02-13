@@ -7,6 +7,7 @@ from pack.my_logging import logging
 config = load_config()
 use_token_url, chat_api_key = config['use_token_url'], config['chat_api_key']
 
+
 def get_use_token():
     try:
         payload = json.dumps({
