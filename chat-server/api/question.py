@@ -28,9 +28,13 @@ history = [
 
 
 # 问答接口
-async def forward_request(question: dict, current_user: int = Depends(get_current_user)):
+async def forward_request(
+    question: dict, current_user: int = Depends(get_current_user)
+):
     try:
-        logging.info(f"用户ID[{current_user.user_id}]-问题：{question['question']}, 模型：{question['model']}")
+        logging.info(
+            f"用户ID[{current_user.user_id}]-问题：{question['question']}, 模型：{question['model']}"
+        )
         assistant_content = ""  # 用于存储最终内容的全局变量
         history.append({"role": "user", "content": question["question"]})
         payload = json.dumps(
@@ -59,7 +63,9 @@ async def forward_request(question: dict, current_user: int = Depends(get_curren
                         mChunk = chunk.decode("utf-8")
                         data = mChunk.split("data: ")[1]  # 直接分割并获取第二部分
                         if data.endswith("[DONE]"):
-                            logging.info(f"用户ID[{current_user.user_id}]-回答为： {assistant_content}")
+                            logging.info(
+                                f"用户ID[{current_user.user_id}]-回答为： {assistant_content}"
+                            )
                             history.append(
                                 {"role": "assistant", "content": assistant_content}
                             )
@@ -84,7 +90,15 @@ async def forward_request(question: dict, current_user: int = Depends(get_curren
                         return
 
         # 返回生成器
-        return StreamingResponse(generate(), media_type="text/event-stream")
+        return StreamingResponse(
+            generate(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",  # 禁用 Nginx 的缓冲
+            },
+        )
 
     except requests.exceptions.RequestException as e:
         # 捕获请求相关的异常
