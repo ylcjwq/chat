@@ -1,5 +1,5 @@
-import React from "react";
-import { Form, Input, Button, Card } from "antd";
+import React, { useEffect } from "react";
+import { Form, Input, Button, Card, Checkbox } from "antd";
 import {
   UserOutlined,
   LockOutlined,
@@ -13,10 +13,22 @@ import { useNavigate } from "react-router";
 const Login: React.FC = () => {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const remember = localStorage.getItem("remember");
+    if (remember === "true") {
+      navigate("/home");
+    }
+  }, []);
+
   const onFinish = async (values: any) => {
     const res = await postLogin(values);
     const data = await res.json();
     localStorage.setItem("token", data.token);
+    if (values.remember) {
+      localStorage.setItem("remember", "true");
+    } else {
+      localStorage.setItem("remember", "false");
+    }
     // 跳转到聊天页面
     navigate("/home");
   };
@@ -51,6 +63,9 @@ const Login: React.FC = () => {
                 visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
               }
             />
+          </Form.Item>
+          <Form.Item name="remember" valuePropName="checked">
+            <Checkbox style={{ color: "#fff" }}>30天免登录</Checkbox>
           </Form.Item>
           <Form.Item>
             <div className="login-form-button-container">
