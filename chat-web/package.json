@@ -7,6 +7,7 @@
     "dev": "vite --open",
     "prod": "vite --mode test",
     "build": "tsc && vite build --mode prod",
+    "build:min": "tsc && vite build --mode prod --max-old-space-size=1024",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
