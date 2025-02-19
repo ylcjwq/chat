@@ -131,7 +131,7 @@ const Home: React.FC = () => {
             />
           </Tooltip>
           <div className="logo">
-            <span>小金-AI</span>
+            <span>小金AI</span>
           </div>
         </Header>
         <Content style={{ margin: "10px 10px 0", height: contentHeight, overflowY: "auto" }}>
